@@ -4,11 +4,21 @@
   Best check yo self, you're not...
 </div>
 
-
-
-<div class="well">
-
-      <img src="/images/cards/clubs_10.jpg" alt="">
-      <img src="/images/cards/clubs_9.jpg" alt="">
-      <img src="/images/cards/clubs_8.jpg" alt="">
+<div class="Dealer's Card">
+	<h4>Dealer's Card</h4>
+	<% session[:dealer][:cards].each_with_index do |card,index| %>
+		<% if (index == 0) &&  (session[:show_first_card]==false) %>
+			<%= HTMLOut.card_cover %>
+		<% else %>
+			<%= HTMLOut.cards_img(card) %>
+		<% end %>
+    <% end %>
 </div>
+
+<div class="Player's Card">
+	<h4>Player's Card</h4>
+	<% session[:player][:cards].each do |card| %>
+    <%= HTMLOut.cards_img(card) %>
+    <% end %>
+</div>
+
