@@ -1,8 +1,3 @@
-<div class="alert alert-block">
-  <button type="button" class="close" data-dismiss="alert">&times;</button>
-  <h4>Warning!</h4>
-  Best check yo self, you're not...
-</div>
 
 <div class="Dealer's Card">
 	<h4>Dealer's Card</h4>
@@ -13,12 +8,45 @@
 			<%= HTMLOut.cards_img(card) %>
 		<% end %>
     <% end %>
+    <% if session[:conclusion_or_not] == true %>
+    <%= "<h4>Dealer #{session[:dealer][:name]}'s total value = #{session[:dealer][:total_value]}" %>
+    <% end %>
+
+  <% if (session[:dealer_turn_or_not] == true) && (session[:conclusion_or_not] == false) %>
+    <p>
+      <form action='/game/dealer' method='post'>
+          <input type='submit' class='btn btn-primary' value='Click to see dealer card &rarr;'>
+        </form>
+    </p>
+  <% end %>
+
 </div>
+
+
 
 <div class="Player's Card">
 	<h4>Player's Card</h4>
 	<% session[:player][:cards].each do |card| %>
     <%= HTMLOut.cards_img(card) %>
     <% end %>
+    <%= "<h4>Player #{session[:player][:name]}'s total value = #{session[:player][:total_value]}, dollars = #{session[:dollars]}</h4>" %>
 </div>
+
+
+<% if session[:dealer_turn_or_not] ==  false %>
+  <form id="hit_form" action="/game/hit" method='post'>
+    <input type="submit" class="btn btn-success" value="Hit" />
+  </form>
+  <form id="stay_form" action="/game/stay" method='post'>
+    <input type="submit" class="btn btn-warning" value="Stay" />
+  </form>
+<% end %>
+</p>
+
+<% if session[:conclusion_or_not] == true %>
+  <form id="hit_form" action="/bet" method='get'>
+    <input type="submit" class="btn btn-success" value="Start Over" />
+  </form>
+  <%= "<h2>#{session[:conclusion]}</h2>" %>
+<% end %>
 

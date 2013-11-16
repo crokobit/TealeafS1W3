@@ -72,13 +72,6 @@ helpers do
       end
     end
 
-    def puts_cards who
-      role = ( who[:dealer_or_not] ? 'dealer' : 'player' )
-      puts"#{role} #{@name} has cards"
-      who[:cards].each {|card| card.puts_card }
-      puts"total value = #{@total_value}"
-      puts ''
-    end
 
 
   end
@@ -116,14 +109,23 @@ helpers do
       "<img src='/images/cards/cover.jpg' class='card_image'>"
     end
 
-end
+  end
 
 end
 
+module Game
+
+
+
+
+
+
+end
 
 include Deck
 include People
 include HTMLOut
+include Game
 
 get '/' do
 
@@ -140,7 +142,7 @@ get '/presetgame' do
   session[:dollars] = 500
   session[:decks] = Deck.initialize_deck(1)
   session[:player] = Human.new(session[:playername],[],0,false)
-  session[:dealer] = Human.new('dealer',[],0,true)
+  session[:dealer] = Human.new('',[],0,true)
 
   redirect '/bet'
 
@@ -162,10 +164,102 @@ get '/startgame' do
     People.push(session[:decks].pop,session[:player])
     People.push(session[:decks].pop,session[:dealer])
   end
+  session[:show_first_card] = false
+  session[:conclusion_or_not] = false
+  session[:dealer_turn_or_not] = false
+  session[:conclusion] = ''
   redirect '/game'
 end
 
 get '/game' do
-  session[:show_first_card] = false
+
+  if !(People.status(session[:player]) == 'safe')
+    redirect '/game/conclusion'
+  end
+
   erb:game
+
 end
+
+post '/game/hit' do
+
+  People.push(session[:decks].pop,session[:player])
+  case People.status(session[:player])
+  when 'busted'     then redirect '/game/conclusion'
+  when 'BlackJack'  then redirect '/game/conclusion'
+  when 'safe'       then redirect '/game'
+  end
+
+
+end
+
+post '/game/stay' do
+
+  session[:dealer_turn_or_not] = true
+  erb:game
+
+end
+
+
+post '/game/dealer' do
+
+  People.push(session[:decks].pop,session[:dealer])  
+
+  if( session[:dealer][:total_value] < 17 )
+    erb:game
+  else
+    redirect '/game/conclusion'
+  end
+
+
+end
+
+get '/game/conclusion' do
+
+  session[:conclusion_or_not] = true
+  session[:show_first_card] = true
+
+  ps = People.status(session[:player])
+  ds = People.status(session[:dealer])
+  if ps == 'busted'
+    session[:conclusion] = "dealer wins!"
+  elsif ds == 'busted'
+    session[:conclusion] = "player #{session[:player][:name]} wins!"
+  elsif ps == 'safe' && ds == 'safe'
+
+    if session[:dealer][:total_value] > session[:player][:total_value]
+      session[:conclusion] = "dealer wins"
+    elsif session[:dealer][:total_value] < session[:player][:total_value]
+      session[:conclusion] = "player #{ session[:player][:name] } wins"
+    else
+      session[:conclusion] = 'draw'
+    end
+
+  elsif ps == ds
+    session[:conclusion] = "draw"
+  elsif ps == 'BlackJack'
+    session[:conclusion] = "player #{ session[:player][:name] } wins"
+  elsif ds == 'BlackJack'
+    session[:conclusion] = "dealer wins"
+  end
+
+  erb:game
+
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
