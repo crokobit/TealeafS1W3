@@ -66,9 +66,18 @@ helpers do
 
     def push (card, who)
       who[:cards].push(card)
-      who[:total_value] += card[:value]
-      who[:cards].select { |card| card[:show_value] == 'A' }.count.times do
-        who[:total_value] +=10 if ( who[:total_value] + 10 ) <= 21
+      People.calculate_value(who)
+
+    end
+
+    def calculate_value who
+      who[:total_value] = 0
+      who[:cards].each {|card| who[:total_value] += card[:value]}
+      who[:cards].each do |card|
+      who[:cards].select { |card| card[:show_value] == 'A' }.count.times do       
+        who[:total_value] += 10 if ( who[:total_value] + 10 ) <= 21
+      end
+
       end
     end
 
@@ -215,22 +224,23 @@ post '/game/dealer' do
 end
 
 get '/game/conclusion' do
-
+  session[:dealer_turn_or_not] = true
   session[:conclusion_or_not] = true
   session[:show_first_card] = true
 
   ps = People.status(session[:player])
   ds = People.status(session[:dealer])
+
   if ps == 'busted'
-    session[:conclusion] = "dealer wins!"
+    session[:conclusion] = "dealer"
   elsif ds == 'busted'
-    session[:conclusion] = "player #{session[:player][:name]} wins!"
+    session[:conclusion] = "player"
   elsif ps == 'safe' && ds == 'safe'
 
     if session[:dealer][:total_value] > session[:player][:total_value]
-      session[:conclusion] = "dealer wins"
+      session[:conclusion] = "dealer"
     elsif session[:dealer][:total_value] < session[:player][:total_value]
-      session[:conclusion] = "player #{ session[:player][:name] } wins"
+      session[:conclusion] = "player"
     else
       session[:conclusion] = 'draw'
     end
@@ -238,9 +248,16 @@ get '/game/conclusion' do
   elsif ps == ds
     session[:conclusion] = "draw"
   elsif ps == 'BlackJack'
-    session[:conclusion] = "player #{ session[:player][:name] } wins"
+    session[:conclusion] = "player"
   elsif ds == 'BlackJack'
-    session[:conclusion] = "dealer wins"
+    session[:conclusion] = "dealer"
+  end
+
+
+  case session[:conclusion]
+  when 'draw' then
+  when 'dealer' then session[:dollars] -= session[:bet].to_i
+  when 'player' then session[:dollars] += session[:bet].to_i
   end
 
   erb:game

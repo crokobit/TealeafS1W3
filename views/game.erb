@@ -47,6 +47,6 @@
   <form id="hit_form" action="/bet" method='get'>
     <input type="submit" class="btn btn-success" value="Start Over" />
   </form>
-  <%= "<h2>#{session[:conclusion]}</h2>" %>
+  <%= "<h2>#{session[:conclusion]} wins, you now have #{session[:dollars]} dollars </h2>" %>
 <% end %>
 
