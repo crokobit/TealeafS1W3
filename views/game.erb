@@ -47,6 +47,10 @@
   <form id="hit_form" action="/bet" method='get'>
     <input type="submit" class="btn btn-success" value="Start Over" />
   </form>
+  <% if session[:conclusion] != 'draw' %>
   <%= "<h2>#{session[:conclusion]} wins, you now have #{session[:dollars]} dollars </h2>" %>
+  <% else %>
+  <%= "<h2>#{session[:conclusion]}, you now have #{session[:dollars]} dollars </h2>" %>
+  <% end %>
 <% end %>
 
