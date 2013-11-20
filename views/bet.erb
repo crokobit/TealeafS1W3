@@ -1,5 +1,10 @@
+<% if !( session[:dollars] <= 0 ) %>
 <form class="navbar-form pull-left" action="/bet" method="post">
   <p> <%= session[:name] %> you have <%= session[:dollars] %> dollars</p>
   bet : <input type="text" class="span2" name="bet">
   <button type="submit" class="btn">Submit</button>
 </form>
+<% else %>
+	<h2>No money QQ</h2>
+<% end %>
+

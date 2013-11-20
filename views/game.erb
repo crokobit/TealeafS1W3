@@ -1,5 +1,7 @@
+<div id="Game">
 
-<div class="Dealer's Card">
+<div class="well" id="Dealer_Card">
+
 	<h4>Dealer's Card</h4>
 	<% session[:dealer][:cards].each_with_index do |card,index| %>
 		<% if (index == 0) &&  (session[:show_first_card]==false) %>
@@ -7,7 +9,7 @@
 		<% else %>
 			<%= HTMLOut.cards_img(card) %>
 		<% end %>
-    <% end %>
+  <% end %>
     <% if session[:conclusion_or_not] == true %>
     <%= "<h4>Dealer #{session[:dealer][:name]}'s total value = #{session[:dealer][:total_value]}" %>
     <% end %>
@@ -24,27 +26,29 @@
 
 
 
-<div class="Player's Card">
+<div class="well" id="Player_Card">
+
 	<h4>Player's Card</h4>
 	<% session[:player][:cards].each do |card| %>
     <%= HTMLOut.cards_img(card) %>
     <% end %>
     <%= "<h4>Player #{session[:player][:name]}'s total value = #{session[:player][:total_value]}, dollars = #{session[:dollars]}</h4>" %>
+    
 </div>
 
 
 <% if session[:dealer_turn_or_not] ==  false %>
   <form id="hit_form" action="/game/hit" method='post'>
-    <input type="submit" class="btn btn-success" value="Hit" />
+    <input type="submit" class="btn btn-success" id="hit_btn" value="Hit" />
   </form>
   <form id="stay_form" action="/game/stay" method='post'>
-    <input type="submit" class="btn btn-warning" value="Stay" />
+    <input type="submit" class="btn btn-warning" id="stay_btn" value="Stay" />
   </form>
 <% end %>
 </p>
 
 <% if session[:conclusion_or_not] == true %>
-  <form id="hit_form" action="/bet" method='get'>
+  <form id="Start_Over_btn" action="/bet" method='get'>
     <input type="submit" class="btn btn-success" value="Start Over" />
   </form>
   <% if session[:conclusion] != 'draw' %>
@@ -53,4 +57,6 @@
   <%= "<h2>#{session[:conclusion]}, you now have #{session[:dollars]} dollars </h2>" %>
   <% end %>
 <% end %>
+
+</div>
 
